@@ -18,18 +18,19 @@ s_node * list_create(void){
     // return list_node;
     return NULL;
 }
+
 // donne la data du node
-void *list_get_data(s_node *node){
+void *list_get_data(const s_node *node){
     if(node == NULL) return NULL;
     return node->data;
     
 }
-
+//setter de la data
 void list_set_data(s_node *node,void *data){
     if(node ==NULL) return ;
     node->data = data;
 }
-//en tete
+//insert en tete
 s_node * list_insert(s_node*head, void *data){
     s_node *node = malloc(sizeof(s_node));
     if(node==NULL) return head;
@@ -39,12 +40,13 @@ s_node * list_insert(s_node*head, void *data){
     
 }
 //return *p sur le node next
-s_node * list_next(s_node *head){
+s_node * list_next(const s_node *head){
     if(head == NULL) return NULL;
     return head->next;
 }
 //return head
 //insert en queue de liste
+
 s_node *list_append(s_node*head, void *data){
     
     s_node *node = malloc(sizeof(s_node));
@@ -52,23 +54,27 @@ s_node *list_append(s_node*head, void *data){
 
     node->data = data;
 
+    //cree nouv tete si list vide
     if(head == NULL){
         node->next = NULL;
         return head = node;
         
     }
-
+    //parcours jusqu'a la queue
     s_node *nextN = head;
     while(nextN->next!=NULL){
         nextN = nextN->next;
     
     }
+    //insert le node en queue de liste
     nextN->next = node;
     node->next = NULL;
     return head;
     
 }
-//** head pour pouvoir modif sinon *head copie de head
+
+
+//** head pour pouvoir modif sinon *head est une copie de head
 s_node * list_orderedAppend(s_node ** head,int (*compare)(s_node *, void*),void * param){
 
 
@@ -79,43 +85,42 @@ s_node * list_orderedAppend(s_node ** head,int (*compare)(s_node *, void*),void 
     nouv->data = param;
     nouv->next = NULL;
     
-    //parcourir la liste et placer dans l'ordre la donnée a inserer 7,15,19
+    //verif tete sinon nouv = head
     if(*head == NULL) {
         *head = nouv;
         return nouv;
     }
-    s_node *curr = *head;
-    s_node *pres = NULL;
+    s_node *n_curr = *head;
+    s_node *n_pres = NULL;
 
-    while(curr!=NULL){
-        int res = compare(curr,nouv->data);
-        //egaux
+    //parcourt puis compare les data
+    while(n_curr!=NULL){
+
+        int res = compare(n_curr,nouv->data);
+        //egaux alors on annule
         if(res==0){
-            
             free(nouv);
 		    return *head;
-
-        }//param < au node 
+        }
+        //nouv placer avant le n_curr
         else if(res>=1){
-            nouv->next = curr;
-        
-            if(pres == NULL){
+            nouv->next = n_curr;
+            //nouv = head
+            if(n_pres == NULL){
                 *head = nouv;
-            }else{
-                pres->next = nouv;   
+            }else{//on relie les nodes
+                n_pres->next = nouv;   
             }
             return *head;
-        }//param > au node
-        
-        else{
-            
-            pres = curr;
-            curr =curr->next;
         }
-       
-        
+        //nouv an_ n_curr 
+        else{  
+            n_pres = n_curr;
+            n_curr =n_curr->next;
+        } 
     }
-     pres->next = nouv;
+    //insert fin de list
+    n_pres->next = nouv;
     return *head;
 }
 
@@ -124,13 +129,16 @@ s_node * list_orderedAppend(s_node ** head,int (*compare)(s_node *, void*),void 
 s_node * list_remove(s_node *head, void *data){
     s_node *pres = NULL;
     s_node *n_actuel = head;
+    
     while(n_actuel != NULL){
         if(list_get_data(n_actuel) == data){
-            if(pres == NULL){            /* c'est la tête */
+            //la head
+            if(pres == NULL){           
                 s_node *nouvHead = n_actuel->next;
                 free(n_actuel);
                 return nouvHead;
             }
+            //relie le trou laisser par remove
             pres->next = n_actuel->next;
             free(n_actuel);
             return head;
